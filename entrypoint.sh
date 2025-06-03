@@ -14,25 +14,44 @@ if [ ! -f "/data/Achievement_3.3.5_12340.csv" ]; then
     cp /app/data/* /data/ 2>/dev/null || true
 fi
 
-# Vérifier si l'archive tar.gz est présente et l'extraire si nécessaire
-ARCHIVE_PATH="/data/data.tar.gz"
-if [ ! -d "/data/meta" ] && [ -f "$ARCHIVE_PATH" ]; then
-    echo "Archive trouvée: $ARCHIVE_PATH"
-    echo "Extraction en cours..."
-    cd /data
-    tar -xzf "$ARCHIVE_PATH"
-    if [ $? -eq 0 ]; then
-        echo "Extraction terminée avec succès"
-        # Optionnel: supprimer l'archive après extraction
-        # rm "$ARCHIVE_PATH"
-    else
-        echo "ERREUR: Échec de l'extraction de l'archive"
+# Télécharger et extraire les données du model viewer si nécessaire
+if [ ! -d "/data/meta" ]; then
+    echo "Téléchargement des données du model viewer..."
+    
+    # URLs à essayer (ajustez selon les releases disponibles)
+    URLS=(
+        "https://github.com/r-o-b-o-t-o/azerothcore-armory/releases/latest/download/data.tar.gz"
+        "https://github.com/r-o-b-o-t-o/azerothcore-armory/releases/download/v1.0.0/data.tar.gz"
+        "https://github.com/whit3str/azerothcore-armory/releases/latest/download/data.tar.gz"
+    )
+    
+    DOWNLOADED=false
+    for url in "${URLS[@]}"; do
+        echo "Tentative de téléchargement depuis: $url"
+        if curl -L -f -o /tmp/modelviewer-data.tar.gz "$url" 2>/dev/null; then
+            echo "Téléchargement réussi, extraction en cours..."
+            cd /data
+            if tar -xzf /tmp/modelviewer-data.tar.gz; then
+                echo "Extraction terminée avec succès"
+                rm /tmp/modelviewer-data.tar.gz
+                DOWNLOADED=true
+                break
+            else
+                echo "Échec de l'extraction"
+                rm -f /tmp/modelviewer-data.tar.gz
+            fi
+        fi
+    done
+    
+    if [ "$DOWNLOADED" = false ]; then
+        echo "ATTENTION: Impossible de télécharger automatiquement les données"
+        echo "Vous pouvez placer manuellement l'archive data.tar.gz dans /data/"
     fi
-elif [ -d "/data/meta" ]; then
-    echo "Données du model viewer déjà présentes"
-elif [ ! -f "$ARCHIVE_PATH" ]; then
-    echo "ATTENTION: Archive data.tar.gz non trouvée dans /data"
-    echo "L'application peut ne pas fonctionner correctement"
+elif [ -f "/data/data.tar.gz" ]; then
+    # Si l'archive existe déjà localement, l'extraire
+    echo "Archive locale trouvée, extraction..."
+    cd /data
+    tar -xzf data.tar.gz && rm data.tar.gz
 fi
 
 # Créer le lien symbolique
