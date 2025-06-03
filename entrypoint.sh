@@ -20,7 +20,7 @@ if [ ! -d "/data/static" ]; then
     cp -r /app/static /data/ 2>/dev/null || true
 fi
 
-# Copier le dossier src si nécessaire pour les routes
+# Copier le dossier src si nécessaire
 if [ ! -d "/data/src" ]; then
     echo "Copie du code source..."
     cp -r /app/src /data/ 2>/dev/null || true
@@ -56,12 +56,32 @@ if [ ! -d "/data/meta" ]; then
     
     if [ "$DOWNLOADED" = false ]; then
         echo "ATTENTION: Impossible de télécharger automatiquement les données"
+        echo "Vous pouvez placer manuellement l'archive data.tar.gz dans /data/"
     fi
+elif [ -f "/data/data.tar.gz" ]; then
+    # Si l'archive existe déjà localement, l'extraire
+    echo "Archive locale trouvée, extraction..."
+    cd /data
+    tar -xzf data.tar.gz && rm data.tar.gz
 fi
 
-# Créer le lien symbolique
+# Créer des liens symboliques pour que l'application trouve les fichiers
+if [ -d "/data/static" ]; then
+    rm -rf /app/static
+    ln -sf /data/static /app/static
+    echo "Lien symbolique créé: /app/static -> /data/static"
+fi
+
+if [ -d "/data/src" ]; then
+    rm -rf /app/src
+    ln -sf /data/src /app/src
+    echo "Lien symbolique créé: /app/src -> /data/src"
+fi
+
+# Créer le lien pour les données
 rm -rf /app/data
 ln -sf /data /app/data
+echo "Lien symbolique créé: /app/data -> /data"
 
 echo "Initialisation terminée. Démarrage de l'application..."
 
