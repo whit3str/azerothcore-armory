@@ -15,6 +15,12 @@ RUN npm install
 # Copier le code source
 COPY . .
 
+# Copier explicitement le dossier static (important !)
+COPY static/ ./static/
+
+# Copier le dossier src si nécessaire
+COPY src/ ./src/
+
 # Copier le fichier de config par défaut
 COPY config.default.json /defaults/config.json
 
