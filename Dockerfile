@@ -2,11 +2,11 @@ FROM node:16
 
 WORKDIR /app
 
-# Installer les outils nécessaires
-RUN apt-get update && apt-get install -y curl unzip && rm -rf /var/lib/apt/lists/*
+# Installer tar et gzip pour l'extraction
+RUN apt-get update && apt-get install -y tar gzip && rm -rf /var/lib/apt/lists/*
 
 # Créer les dossiers nécessaires
-RUN mkdir -p /data /logs /defaults /app/data-template
+RUN mkdir -p /data /logs /defaults
 
 # Copier les fichiers de dépendances et installer
 COPY package*.json ./
@@ -14,9 +14,6 @@ RUN npm install
 
 # Copier le code source
 COPY . .
-
-# Copier les fichiers CSV existants vers le template
-COPY data/ /app/data-template/
 
 # Copier le fichier de config par défaut
 COPY config.default.json /defaults/config.json
