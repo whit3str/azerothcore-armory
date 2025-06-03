@@ -2,8 +2,8 @@ FROM node:16
 
 WORKDIR /app
 
-# Installer tar et gzip pour l'extraction
-RUN apt-get update && apt-get install -y tar gzip && rm -rf /var/lib/apt/lists/*
+# Installer curl et tar pour le téléchargement/extraction
+RUN apt-get update && apt-get install -y curl tar gzip && rm -rf /var/lib/apt/lists/*
 
 # Créer les dossiers nécessaires
 RUN mkdir -p /data /logs /defaults
@@ -14,12 +14,6 @@ RUN npm install
 
 # Copier le code source
 COPY . .
-
-# Copier explicitement le dossier static (important !)
-COPY static/ ./static/
-
-# Copier le dossier src si nécessaire
-COPY src/ ./src/
 
 # Copier le fichier de config par défaut
 COPY config.default.json /defaults/config.json
