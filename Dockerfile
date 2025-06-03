@@ -1,15 +1,27 @@
 FROM node:16
 
-# Créer les dossiers /data et /logs dans l'image
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Créer les dossiers nécessaires dans l'image
 RUN mkdir -p /data /logs /defaults
+
+# Copier les fichiers de dépendances en premier (pour optimiser le cache Docker)
+COPY package*.json ./
+
+# Installation des dépendances
+RUN npm install
+
+# Copier tout le code source
+COPY . .
+
+# Copier le dossier data vers l'image (préservation de la structure)
+COPY data/ /data/
 
 # Copier et renommer le fichier de config par défaut
 COPY config.default.json /defaults/config.json
 
-# Installation des dépendances et build
-COPY package*.json ./
-RUN npm install
-COPY . .
+# Build de l'application
 RUN npm run build
 
 # Script d'initialisation des données
