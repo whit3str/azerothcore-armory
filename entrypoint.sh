@@ -14,11 +14,22 @@ if [ ! -f "/data/Achievement_3.3.5_12340.csv" ]; then
     cp /app/data/* /data/ 2>/dev/null || true
 fi
 
+# Copier les fichiers statiques (CSS, JS, images) si manquants
+if [ ! -d "/data/static" ]; then
+    echo "Copie des fichiers statiques..."
+    cp -r /app/static /data/ 2>/dev/null || true
+fi
+
+# Copier le dossier src si nécessaire pour les routes
+if [ ! -d "/data/src" ]; then
+    echo "Copie du code source..."
+    cp -r /app/src /data/ 2>/dev/null || true
+fi
+
 # Télécharger et extraire les données du model viewer si nécessaire
 if [ ! -d "/data/meta" ]; then
     echo "Téléchargement des données du model viewer..."
     
-    # URLs à essayer (ajustez selon les releases disponibles)
     URLS=(
         "https://github.com/r-o-b-o-t-o/azerothcore-armory/releases/latest/download/data.tar.gz"
         "https://github.com/r-o-b-o-t-o/azerothcore-armory/releases/download/v1.0.0/data.tar.gz"
@@ -45,13 +56,7 @@ if [ ! -d "/data/meta" ]; then
     
     if [ "$DOWNLOADED" = false ]; then
         echo "ATTENTION: Impossible de télécharger automatiquement les données"
-        echo "Vous pouvez placer manuellement l'archive data.tar.gz dans /data/"
     fi
-elif [ -f "/data/data.tar.gz" ]; then
-    # Si l'archive existe déjà localement, l'extraire
-    echo "Archive locale trouvée, extraction..."
-    cd /data
-    tar -xzf data.tar.gz && rm data.tar.gz
 fi
 
 # Créer le lien symbolique
