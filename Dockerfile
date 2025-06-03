@@ -1,31 +1,21 @@
 FROM node:16
 
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Installer curl pour télécharger les données
+# Installer les outils nécessaires
 RUN apt-get update && apt-get install -y curl unzip && rm -rf /var/lib/apt/lists/*
 
 # Créer les dossiers nécessaires
-RUN mkdir -p /data /logs /defaults
+RUN mkdir -p /data /logs /defaults /app/data-template
 
-# Copier les fichiers de dépendances
+# Copier les fichiers de dépendances et installer
 COPY package*.json ./
-
-# Installation des dépendances
 RUN npm install
 
-# Copier tout le code source
+# Copier le code source
 COPY . .
 
-# Télécharger les données du model viewer depuis les Releases
-# Remplacez l'URL par la dernière version disponible sur GitHub
-RUN curl -L -o /tmp/modelviewer-data.zip \
-    "https://github.com/r-o-b-o-t-o/azerothcore-armory/releases/latest/download/modelviewer-data.zip" && \
-    unzip /tmp/modelviewer-data.zip -d /app/data-template/ && \
-    rm /tmp/modelviewer-data.zip
-
-# Copier les fichiers CSV et images existants
+# Copier les fichiers CSV existants vers le template
 COPY data/ /app/data-template/
 
 # Copier le fichier de config par défaut
