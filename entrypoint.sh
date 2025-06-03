@@ -1,11 +1,24 @@
-#!/bin/sh
-set -e
+#!/bin/bash
 
-# Copier les fichiers par défaut dans /data si le dossier est vide
-if [ -z "$(ls -A /data)" ]; then
-  echo "Initialisation des fichiers de config..."
-  cp /defaults/config.json /data/
+echo "Initialisation des fichiers de config..."
+
+# Copier le fichier de config par défaut si il n'existe pas
+if [ ! -f /data/config.json ]; then
+    cp /defaults/config.json /data/config.json
+    echo "Fichier de configuration par défaut copié"
 fi
 
-# Exécuter la commande principale (npm start)
+# Vérifier si le dossier /data est vide (volume monté vide)
+if [ ! -d "/data/meta" ]; then
+    echo "Copie des données par défaut..."
+    cp -r /app/data/* /data/
+    echo "Données copiées avec succès"
+fi
+
+# Créer un lien symbolique pour que l'application trouve les données
+if [ ! -L "/app/data" ]; then
+    rm -rf /app/data
+    ln -sf /data /app/data
+fi
+
 exec "$@"
