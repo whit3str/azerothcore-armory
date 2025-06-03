@@ -28,4 +28,4 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 48733
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["npm", "start"]
+CMD ["node", "--expose-gc", "build/armory/main.js"]  # ← Changement ici
