@@ -15,8 +15,11 @@ RUN npm install
 # Copier tout le code source
 COPY . .
 
-# Copier le dossier data vers l'image (préservation de la structure)
-COPY data/ /data/
+# Copier explicitement le dossier data du repository vers /app/data
+COPY data/ ./data/
+
+# Créer un lien symbolique vers /data pour la compatibilité avec le volume
+RUN ln -sf /app/data /data/default
 
 # Copier et renommer le fichier de config par défaut
 COPY config.default.json /defaults/config.json
