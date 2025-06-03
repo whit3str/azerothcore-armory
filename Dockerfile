@@ -1,10 +1,10 @@
 FROM node:16
 
 # Créer les dossiers /data et /logs dans l'image
-RUN mkdir -p /data /logs
+RUN mkdir -p /data /logs /defaults
 
-# Copier les fichiers par défaut (ex: config.json) dans un dossier temporaire
-COPY config.json /defaults/
+# Copier et renommer le fichier de config par défaut
+COPY config.default.json /defaults/config.json
 
 # Installation des dépendances et build
 COPY package*.json ./
